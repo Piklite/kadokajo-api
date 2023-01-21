@@ -4,11 +4,10 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
-import { UsersService } from 'src/users/users.service';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigService } from '@nestjs/config/dist';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 
 @Module({
   imports: [
@@ -17,7 +16,7 @@ import { PrismaService } from 'src/prisma.service';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: 3600,
+          expiresIn: configService.get<number>('JWT_EXPIRATION_DATE'),
         },
       }),
       inject: [ConfigService],
@@ -25,13 +24,7 @@ import { PrismaService } from 'src/prisma.service';
     UsersModule,
   ],
 
-  providers: [
-    PrismaService,
-    LocalStrategy,
-    JwtStrategy,
-    AuthService,
-    UsersService,
-  ],
+  providers: [PrismaService, LocalStrategy, JwtStrategy, AuthService],
   controllers: [AuthController],
 })
 export class AuthModule {}

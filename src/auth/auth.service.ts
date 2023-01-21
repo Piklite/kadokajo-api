@@ -1,50 +1,54 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { Prisma, User } from '@prisma/client';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
+import { LoginResponseDto } from 'src/users/dto/login-response.dto';
+import { UserResponseDto } from 'src/users/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.usersService.findOne({ email });
-    if (!user) return null;
-    const passwordValid = await bcrypt.compare(password, user.password);
-    if (!user) throw new NotAcceptableException('Could not find the user');
-    if (user && passwordValid) {
-      return user;
-    }
-    return null;
-  }
-
-  async login(user: User) {
+  async login(user: User): Promise<LoginResponseDto> {
     const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async createAccount(userCreateInput: Prisma.UserCreateInput): Promise<User> {
+  async createAccount(
+    userCreateInput: Prisma.UserCreateInput,
+  ): Promise<UserResponseDto> {
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(
       userCreateInput.password,
       saltOrRounds,
     );
-    return await this.usersService.createOne({
+    const { id, email, username } = await this.usersService.createOne({
       ...userCreateInput,
       password: hashedPassword,
     });
+    return { id, email, username };
   }
 
-  async deleteAccount(email: string, password: string) {
-    const user = await this.validateUser(email, password);
-    if (!user) throw new UnauthorizedException('Incorrect email or password');
-    return this.usersService.deleteOne({ email });
+  async deleteAccount(user: User): Promise<UserResponseDto> {
+    const { id, email, username } = await this.usersService.deleteOne({
+      id: user.id,
+    });
+    return { id, email, username };
+  }
+
+  async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.usersService.findOne({ email });
+    if (!user) return null;
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (user && passwordValid) {
+      return user;
+    }
+    return null;
   }
 }
