@@ -28,6 +28,14 @@ CREATE TABLE "Wish" (
     CONSTRAINT "Wish_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "WishlistPartakers" (
+    "userId" INTEGER NOT NULL,
+    "wishlistId" INTEGER NOT NULL,
+
+    CONSTRAINT "WishlistPartakers_pkey" PRIMARY KEY ("userId","wishlistId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -36,3 +44,9 @@ ALTER TABLE "Wishlist" ADD CONSTRAINT "Wishlist_ownerId_fkey" FOREIGN KEY ("owne
 
 -- AddForeignKey
 ALTER TABLE "Wish" ADD CONSTRAINT "Wish_wishlistId_fkey" FOREIGN KEY ("wishlistId") REFERENCES "Wishlist"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WishlistPartakers" ADD CONSTRAINT "WishlistPartakers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "WishlistPartakers" ADD CONSTRAINT "WishlistPartakers_wishlistId_fkey" FOREIGN KEY ("wishlistId") REFERENCES "Wishlist"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

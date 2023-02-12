@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 
-export class UserResponseDto {
+export class UserEntity implements Omit<User, 'password'> {
   @ApiProperty()
   id: number;
 

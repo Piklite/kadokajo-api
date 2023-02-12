@@ -16,7 +16,7 @@ import { PrismaService } from '../prisma.service';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<number>('JWT_EXPIRATION_DATE'),
+          expiresIn: configService.get<string>('JWT_EXPIRATION_DATE'),
         },
       }),
       inject: [ConfigService],

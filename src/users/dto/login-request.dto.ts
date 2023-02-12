@@ -4,6 +4,7 @@ import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 export class LoginRequestDto {
   @IsEmail()
   @IsNotEmpty()
+  @MaxLength(255)
   @ApiProperty()
   email: string;
 

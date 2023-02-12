@@ -11,26 +11,38 @@ datasource db {
 }
 
 model User {
-  id         Int     @default(autoincrement()) @id
-  email      String  @unique
-  username   String  
-  password   String
-  wishlists  Wishlist[]
+  id                   Int     @default(autoincrement()) @id
+  email                String  @unique
+  username             String  
+  password             String
+  createdWishlists     Wishlist[]
+  partakesInWishlists  WishlistPartakers[]
 }
 
 model Wishlist {
-  id           Int     @default(autoincrement()) @id
+  id           Int                  @default(autoincrement()) @id
   title        String
-  description  String
+  description  String? 
   wishes       Wish[]
-  owner        User    @relation(fields: [ownerId], references: [id])
+  createdBy    User                 @relation(fields: [ownerId], references: [id])
   ownerId      Int
+  partakers    WishlistPartakers[]
+  createdAt    DateTime             @default(now())
 }
 
 model Wish {
   id           Int       @default(autoincrement()) @id
   title        String
-  description  String
+  description  String?
   wishlist     Wishlist  @relation(fields: [wishlistId], references: [id])
   wishlistId   Int
+}
+
+model WishlistPartakers {
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  wishlist    Wishlist  @relation(fields: [wishlistId], references: [id])
+  wishlistId  Int
+
+  @@id([userId, wishlistId])
 }
