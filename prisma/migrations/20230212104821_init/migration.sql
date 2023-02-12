@@ -12,8 +12,9 @@ CREATE TABLE "User" (
 CREATE TABLE "Wishlist" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "ownerId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Wishlist_pkey" PRIMARY KEY ("id")
 );
@@ -22,7 +23,7 @@ CREATE TABLE "Wishlist" (
 CREATE TABLE "Wish" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "wishlistId" INTEGER NOT NULL,
 
     CONSTRAINT "Wish_pkey" PRIMARY KEY ("id")
