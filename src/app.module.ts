@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
+import { WishesModule } from './wishes/wishes.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { WishlistsModule } from './wishlists/wishlists.module';
     AuthModule,
     UsersModule,
     WishlistsModule,
+    WishesModule,
   ],
   controllers: [AppController],
 })

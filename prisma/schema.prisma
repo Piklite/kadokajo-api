@@ -36,6 +36,8 @@ model Wish {
   description  String?
   wishlist     Wishlist  @relation(fields: [wishlistId], references: [id])
   wishlistId   Int
+  creatorId    Int
+  createdAt    DateTime  @default(now())
 }
 
 model WishlistsPartakers {
