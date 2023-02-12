@@ -34,10 +34,10 @@ export class WishlistsPartakersService {
   findMany(params: {
     skip?: number;
     take?: number;
-    cursor?: Prisma.WishlistPartakersWhereUniqueInput;
-    where?: Prisma.WishlistPartakersWhereInput;
-    orderBy?: Prisma.WishlistPartakersOrderByWithRelationInput;
-    select?: Prisma.WishlistPartakersSelect;
+    cursor?: Prisma.WishlistsPartakersWhereUniqueInput;
+    where?: Prisma.WishlistsPartakersWhereInput;
+    orderBy?: Prisma.WishlistsPartakersOrderByWithRelationInput;
+    select?: Prisma.WishlistsPartakersSelect;
   }): Promise<
     {
       user?: UserEntity;
@@ -47,7 +47,7 @@ export class WishlistsPartakersService {
     }[]
   > {
     const { skip, take, cursor, where, orderBy, select } = params;
-    return this.prisma.wishlistPartakers.findMany({
+    return this.prisma.wishlistsPartakers.findMany({
       skip,
       take,
       cursor,
