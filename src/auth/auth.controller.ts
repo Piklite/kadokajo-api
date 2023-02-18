@@ -14,7 +14,7 @@ import { LoginRequestDto } from 'src/users/dto/login-request.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { UserToken } from './interfaces/user-token.interface';
 
-@ApiTags('Auth')
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
