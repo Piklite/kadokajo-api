@@ -11,40 +11,38 @@ datasource db {
 }
 
 model User {
-  id                   Int     @default(autoincrement()) @id
-  email                String  @unique
-  username             String  
-  password             String
-  createdWishlists     Wishlist[]
-  partakesInWishlists  WishlistsPartakers[]
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  username         String
+  password         String
+  rolesOnWishlists UsersOnWishlists[]
 }
 
 model Wishlist {
-  id           Int                  @default(autoincrement()) @id
-  title        String
-  description  String? 
-  wishes       Wish[]
-  createdBy    User                 @relation(fields: [ownerId], references: [id])
-  ownerId      Int
-  partakers    WishlistsPartakers[]
-  createdAt    DateTime             @default(now())
+  id          Int                @id @default(autoincrement())
+  title       String
+  description String?
+  wishes      Wish[]
+  createdAt   DateTime           @default(now())
+  users       UsersOnWishlists[]
 }
 
 model Wish {
-  id           Int       @default(autoincrement()) @id
-  title        String
-  description  String?
-  wishlist     Wishlist  @relation(fields: [wishlistId], references: [id])
-  wishlistId   Int
-  creatorId    Int
-  createdAt    DateTime  @default(now())
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  wishlist    Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlistId  Int
+  creatorId   Int
+  createdAt   DateTime @default(now())
 }
 
-model WishlistsPartakers {
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
-  wishlist    Wishlist  @relation(fields: [wishlistId], references: [id])
-  wishlistId  Int
+model UsersOnWishlists {
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlistId Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  isCreator  Boolean  @default(false)
 
-  @@id([userId, wishlistId])
+  @@id([wishlistId, userId])
 }

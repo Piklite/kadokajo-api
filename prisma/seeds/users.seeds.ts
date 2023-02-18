@@ -18,6 +18,15 @@ export async function seedUser2(prisma: PrismaClient) {
   return seedUser(prisma, data);
 }
 
+export async function seedUser3(prisma: PrismaClient) {
+  const data = {
+    email: 'user3@kado.com',
+    username: 'User3',
+    password: '$2b$10$vvNecQ2NxshcBrn2v9LH4emsL2uDQrIBDvbODQmziegHHsbtdHjqO', // 123
+  };
+  return seedUser(prisma, data);
+}
+
 export async function seedUser(
   prisma: PrismaClient,
   data: Prisma.UserCreateInput,

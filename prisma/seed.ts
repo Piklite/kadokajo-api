@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { seedUser1, seedUser2 } from './seeds/users.seeds';
+import { seedUser1, seedUser2, seedUser3 } from './seeds/users.seeds';
 import {
   seedWish1,
   seedWish2,
@@ -19,8 +19,9 @@ async function main() {
   console.log('Started seeding database ...');
   const user1 = await seedUser1(prisma);
   const user2 = await seedUser2(prisma);
+  const user3 = await seedUser3(prisma);
   const wishlist1 = await seedWishlist1(prisma, user1);
-  const wishlist2 = await seedWishlist2(prisma, user1, user2);
+  const wishlist2 = await seedWishlist2(prisma, user1, user2, user3);
   const wishlist3 = await seedWishlist3(prisma, user2);
   await seedWish1(prisma, wishlist1, user1);
   await seedWish2(prisma, wishlist1, user1);
