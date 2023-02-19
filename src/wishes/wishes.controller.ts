@@ -10,8 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WishesService } from './wishes.service';
-import { CreateWishDto } from './dto/create-wish.dto';
-import { UpdateWishDto } from './dto/update-wish.dto';
+import { CreateWishRequestDto } from './dto/create-wish-request.dto';
+import { UpdateWishRequestDto } from './dto/update-wish-request.dto';
 import { WishEntity } from './entities/wish.entity';
 import { UserToken } from '../auth/interfaces/user-token.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -28,9 +28,13 @@ export class WishesController {
   create(
     @Request() { user }: { user: UserToken },
     @Param('wishlistId') wishlistId: string,
-    @Body() createWishDto: CreateWishDto,
+    @Body() createWishRequestDto: CreateWishRequestDto,
   ): Promise<WishEntity> {
-    return this.wishesService.create(createWishDto, +wishlistId, user.id);
+    return this.wishesService.create(
+      createWishRequestDto,
+      +wishlistId,
+      user.id,
+    );
   }
 
   @Get()
@@ -49,9 +53,9 @@ export class WishesController {
   @ApiOkResponse({ type: WishEntity })
   update(
     @Param('id') id: string,
-    @Body() updateWishDto: UpdateWishDto,
+    @Body() updateWishRequestDto: UpdateWishRequestDto,
   ): Promise<WishEntity> {
-    return this.wishesService.update(+id, updateWishDto);
+    return this.wishesService.update(+id, updateWishRequestDto);
   }
 
   @Delete(':id')

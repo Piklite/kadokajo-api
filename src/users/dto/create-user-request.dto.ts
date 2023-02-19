@@ -3,11 +3,12 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
+  // Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateUserRequestDto {
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(255)
@@ -26,4 +27,11 @@ export class CreateUserDto {
   @MaxLength(50)
   @ApiProperty()
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
+  // @Matches('password')
+  @ApiProperty()
+  confirmPassword: string;
 }

@@ -8,13 +8,18 @@ import {
   Delete,
 } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
-import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
+import { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Request, UseGuards } from '@nestjs/common/decorators';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { WishlistEntity } from './entities/wishlist.entity';
 import { UserToken } from '../auth/interfaces/user-token.interface';
+import { AddPartakerToWishlistRequestDto } from './dto/add-partaker-to-wishlist-request.dto';
+import { UserIsPartakerInWishlistGuard } from './guards/user-is-partaker-in-wishlist.guard';
+import { UserIsCreatorOfWishlistGuard } from './guards/user-is-creator-of-wishlist.guard';
+import { UserResponseDto } from '../users/dto/user-response.dto';
+import { WishlistDto } from './dto/wishlist.dto';
+import { UserOnWishlistEntity } from './entities/user-on-wishlist.entity';
 
 @Controller('wishlists')
 @ApiTags('wishlists')
@@ -23,39 +28,60 @@ export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: WishlistEntity })
+  @ApiCreatedResponse({ type: WishlistDto })
   create(
     @Request() { user }: { user: UserToken },
-    @Body() createWishlistDto: CreateWishlistDto,
-  ) {
-    return this.wishlistsService.create(createWishlistDto, user.id);
+    @Body() createWishlistRequestDto: CreateWishlistRequestDto,
+  ): Promise<WishlistDto> {
+    return this.wishlistsService.create(createWishlistRequestDto, user.id);
   }
 
   @Get()
-  @ApiOkResponse({ type: WishlistEntity, isArray: true })
-  findOwnedAndPartakings(@Request() { user }: { user: UserToken }) {
+  @ApiOkResponse({ type: WishlistDto, isArray: true })
+  findOwnedAndPartakings(
+    @Request() { user }: { user: UserToken },
+  ): Promise<WishlistDto[]> {
     return this.wishlistsService.findAll(user.id);
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: WishlistEntity })
-  findOne(@Request() { user }: { user: UserToken }, @Param('id') id: string) {
-    return this.wishlistsService.findOne(+id, user.id);
+  @UseGuards(UserIsPartakerInWishlistGuard)
+  @ApiOkResponse({ type: WishlistDto })
+  findOne(@Param('id') id: string): Promise<WishlistDto> {
+    return this.wishlistsService.findOne(+id);
   }
 
   @Patch(':id')
-  @ApiOkResponse({ type: WishlistEntity })
+  @UseGuards(UserIsCreatorOfWishlistGuard)
+  @ApiOkResponse({ type: WishlistDto })
   update(
-    @Request() { user }: { user: UserToken },
     @Param('id') id: string,
-    @Body() updateWishlistDto: UpdateWishlistDto,
-  ) {
-    return this.wishlistsService.update(+id, updateWishlistDto, user.id);
+    @Body() updateWishlistRequestDto: UpdateWishlistRequestDto,
+  ): Promise<WishlistDto> {
+    return this.wishlistsService.update(+id, updateWishlistRequestDto);
   }
 
   @Delete(':id')
-  @ApiOkResponse({ type: WishlistEntity })
-  delete(@Request() { user }: { user: UserToken }, @Param('id') id: string) {
-    return this.wishlistsService.delete(+id, user.id);
+  @UseGuards(UserIsCreatorOfWishlistGuard)
+  @ApiOkResponse({ type: WishlistDto })
+  delete(@Param('id') id: string): Promise<WishlistDto> {
+    return this.wishlistsService.remove(+id);
+  }
+
+  @Get(':id/partakers')
+  @UseGuards(UserIsPartakerInWishlistGuard)
+  @ApiOkResponse({ type: UserOnWishlistEntity, isArray: true })
+  getPartakers(@Param('id') id: string): Promise<UserOnWishlistEntity[]> {
+    return this.wishlistsService.getPartakers(+id);
+  }
+
+  @Post(':id/partakers')
+  @UseGuards(UserIsCreatorOfWishlistGuard)
+  @ApiOkResponse({ type: UserResponseDto, isArray: true })
+  addPartaker(
+    @Param('id') id: string,
+    @Body() addUserToWishlistDto: AddPartakerToWishlistRequestDto,
+  ): Promise<WishlistDto> {
+    return this.wishlistsService.addPartaker(+id, addUserToWishlistDto);
   }
 }

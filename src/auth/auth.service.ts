@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginResponseDto } from '../users/dto/login-response.dto';
-import { UserEntity } from '../users/entities/user.entity';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateUserRequestDto } from '../users/dto/create-user-request.dto';
 import { UserToken } from './interfaces/user-token.interface';
+import { ChangeUserPasswordRequestDto } from '../users/dto/change-user-password-request.dto';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,25 +22,52 @@ export class AuthService {
     };
   }
 
-  async createAccount(userCreateInput: CreateUserDto): Promise<UserEntity> {
-    const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash(
-      userCreateInput.password,
-      saltOrRounds,
+  async changePassword(
+    changeUserPasswordRequestDto: ChangeUserPasswordRequestDto,
+    userToken: UserToken,
+  ): Promise<UserResponseDto> {
+    if (changeUserPasswordRequestDto.email !== userToken.email) {
+      throw new UnauthorizedException('Invalid email');
+    }
+    const user = await this.validateUser(
+      userToken.email,
+      changeUserPasswordRequestDto.previousPassword,
     );
-    const { id, email, username } = await this.usersService.createOne({
-      ...userCreateInput,
+    if (!user) {
+      throw new UnauthorizedException('Invalid previous password');
+    }
+    const hashedPassword = await this._encryptPassword(
+      changeUserPasswordRequestDto.newPassword,
+    );
+    return this.usersService.update(userToken.id, {
       password: hashedPassword,
     });
+  }
+
+  async createAccount(
+    createUserRequestDto: CreateUserRequestDto,
+  ): Promise<UserResponseDto> {
+    const hashedPassword = await this._encryptPassword(
+      createUserRequestDto.password,
+    );
+    const data = {
+      email: createUserRequestDto.email,
+      username: createUserRequestDto.username,
+      password: hashedPassword,
+    };
+    const { id, email, username } = await this.usersService.create(data);
     return { id, email, username };
   }
 
-  async deleteAccount(userId: number): Promise<UserEntity> {
-    const { id, email, username } = await this.usersService.deleteOne(userId);
+  async deleteAccount(userId: number): Promise<UserResponseDto> {
+    const { id, email, username } = await this.usersService.delete(userId);
     return { id, email, username };
   }
 
-  async validateUser(email: string, password: string): Promise<UserEntity> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserResponseDto> {
     const user = await this.usersService.findOne(email);
     if (!user) return null;
     const passwordValid = await bcrypt.compare(password, user.password);
@@ -48,5 +76,10 @@ export class AuthService {
       return { id, username, email };
     }
     return null;
+  }
+
+  private async _encryptPassword(password: string): Promise<string> {
+    const saltOrRounds = 10;
+    return await bcrypt.hash(password, saltOrRounds);
   }
 }

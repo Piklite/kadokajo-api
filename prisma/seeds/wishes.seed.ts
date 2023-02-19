@@ -3,10 +3,12 @@ import { Prisma, PrismaClient, User, Wishlist } from '@prisma/client';
 export async function seedWishesWishlist1(
   prisma: PrismaClient,
   wishlist: Wishlist,
-  user: User,
+  user1: User,
+  user2: User,
 ) {
-  await seedWish1(prisma, wishlist, user);
-  await seedWish2(prisma, wishlist, user);
+  await seedWish1(prisma, wishlist, user1);
+  await seedWish2(prisma, wishlist, user1);
+  await seedWish3(prisma, wishlist, user2);
 }
 
 export async function seedWishesWishlist2(
@@ -14,9 +16,7 @@ export async function seedWishesWishlist2(
   wishlist: Wishlist,
   user: User,
 ) {
-  await seedWish3(prisma, wishlist, user);
   await seedWish4(prisma, wishlist, user);
-  await seedWish5(prisma, wishlist, user);
 }
 
 export async function seedWish1(

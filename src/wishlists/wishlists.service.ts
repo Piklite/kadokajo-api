@@ -1,19 +1,27 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Prisma, Wishlist } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma.service';
-import { CreateWishlistDto } from './dto/create-wishlist.dto';
+import { CreateWishlistRequestDto } from './dto/create-wishlist-request.dto';
+import { WishlistEntity } from './entities/wishlist.entity';
+import { AddPartakerToWishlistRequestDto } from './dto/add-partaker-to-wishlist-request.dto';
+import { UpdateWishlistRequestDto } from './dto/update-wishlist-request.dto';
+import { UserOnWishlistEntity } from './entities/user-on-wishlist.entity';
 
 @Injectable()
 export class WishlistsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
-  async create(
-    createWishlistDto: CreateWishlistDto,
+  create(
+    createWishlistRequestDto: CreateWishlistRequestDto,
     userId: number,
-  ): Promise<Wishlist> {
+  ): Promise<WishlistEntity> {
     return this.prisma.wishlist.create({
       data: {
-        ...createWishlistDto,
+        ...createWishlistRequestDto,
         users: {
           create: {
             userId,
@@ -24,29 +32,92 @@ export class WishlistsService {
     });
   }
 
-  async findOne(wishlistId: number, userId: number): Promise<Wishlist | null> {
-    const wishlist = await this.checkIfUserIsPartaker(wishlistId, userId);
-    return wishlist;
+  findOne(id: number): Promise<WishlistEntity | null> {
+    return this.prisma.wishlist.findUnique({ where: { id } });
   }
 
-  async findAll(userId: number): Promise<Wishlist[]> {
+  findAll(userId: number): Promise<WishlistEntity[]> {
     return this._findMany({
       where: { users: { some: { userId } } },
     });
   }
 
-  async update(
-    wishlistId: number,
-    data: Prisma.WishlistUpdateInput,
-    userId: number,
-  ): Promise<Wishlist> {
-    await this.checkIfUserIsCreator(wishlistId, userId);
-    return this.prisma.wishlist.update({ where: { id: wishlistId }, data });
+  update(
+    id: number,
+    updateWishlistRequestDto: UpdateWishlistRequestDto,
+  ): Promise<WishlistEntity> {
+    return this.prisma.wishlist.update({
+      where: { id },
+      data: updateWishlistRequestDto,
+    });
   }
 
-  async delete(wishlistId: number, userId: number): Promise<Wishlist> {
-    await this.checkIfUserIsCreator(wishlistId, userId);
+  remove(wishlistId: number): Promise<WishlistEntity> {
     return this.prisma.wishlist.delete({ where: { id: wishlistId } });
+  }
+
+  getPartakers(wishlistId: number): Promise<UserOnWishlistEntity[]> {
+    return this.prisma.usersOnWishlists.findMany({
+      where: { wishlistId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            password: false,
+          },
+        },
+      },
+    });
+  }
+
+  async addPartaker(
+    wishlistId: number,
+    addUserToWishlistDto: AddPartakerToWishlistRequestDto,
+  ): Promise<WishlistEntity> {
+    const newUser = await this.usersService.findOne(addUserToWishlistDto.email);
+    return this.prisma.wishlist.update({
+      where: { id: wishlistId },
+      data: {
+        users: { create: { userId: newUser.id } },
+      },
+    });
+  }
+
+  async validateUserIsPartakerInWishlist(
+    wishlistId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const userOnWishlist = await this.prisma.usersOnWishlists.findUnique({
+      where: {
+        wishlistId_userId: {
+          wishlistId,
+          userId,
+        },
+      },
+    });
+    if (!userOnWishlist) {
+      throw new ForbiddenException();
+    }
+    return true;
+  }
+
+  async validateUserIsCreatorOfWishlist(
+    wishlistId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const userOnWishlist = await this.prisma.usersOnWishlists.findFirst({
+      where: {
+        wishlistId,
+        userId,
+        isCreator: true,
+      },
+    });
+    if (!userOnWishlist) {
+      throw new ForbiddenException();
+    }
+    return true;
   }
 
   private _findMany(params: {
@@ -55,7 +126,7 @@ export class WishlistsService {
     cursor?: Prisma.WishlistWhereUniqueInput;
     where?: Prisma.WishlistWhereInput;
     orderBy?: Prisma.WishlistOrderByWithRelationInput;
-  }): Promise<Wishlist[]> {
+  }): Promise<WishlistEntity[]> {
     const { skip, take, cursor, where, orderBy } = params;
     return this.prisma.wishlist.findMany({
       skip,
@@ -64,42 +135,5 @@ export class WishlistsService {
       where,
       orderBy,
     });
-  }
-
-  private async checkIfUserIsPartaker(
-    wishlistId: number,
-    userId: number,
-  ): Promise<Wishlist> {
-    const wishlist = await this.prisma.wishlist.findFirst({
-      where: {
-        id: wishlistId,
-        users: { some: { userId } },
-      },
-    });
-    if (!wishlist) {
-      throw new ForbiddenException();
-    }
-    return wishlist;
-  }
-
-  private async checkIfUserIsCreator(
-    wishlistId: number,
-    userId: number,
-  ): Promise<Wishlist> {
-    const wishlist = await this.prisma.wishlist.findFirst({
-      where: {
-        id: wishlistId,
-        users: {
-          some: {
-            userId,
-            isCreator: true,
-          },
-        },
-      },
-    });
-    if (!wishlist) {
-      throw new ForbiddenException();
-    }
-    return wishlist;
   }
 }

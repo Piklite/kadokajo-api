@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateWishlistDto {
+export class CreateWishlistRequestDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
