@@ -12,9 +12,9 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Request, UseGuards } from '@nestjs/common/decorators';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { WishlistEntity } from './entities/wishlist.entity';
-import { UserToken } from 'src/auth/interfaces/user-token.interface';
+import { UserToken } from '../auth/interfaces/user-token.interface';
 
 @Controller('wishlists')
 @ApiTags('wishlists')

@@ -10,8 +10,8 @@ import {
 } from '@nestjs/swagger';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginResponseDto } from '../users/dto/login-response.dto';
-import { LoginRequestDto } from 'src/users/dto/login-request.dto';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { LoginRequestDto } from '../users/dto/login-request.dto';
+import { UserEntity } from '../users/entities/user.entity';
 import { UserToken } from './interfaces/user-token.interface';
 
 @ApiTags('auth')

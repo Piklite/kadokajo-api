@@ -13,8 +13,8 @@ import { WishesService } from './wishes.service';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { WishEntity } from './entities/wish.entity';
-import { UserToken } from 'src/auth/interfaces/user-token.interface';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserToken } from '../auth/interfaces/user-token.interface';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('wishlists/:wishlistId/wishes')
