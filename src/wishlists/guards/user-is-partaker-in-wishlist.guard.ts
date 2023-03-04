@@ -9,7 +9,8 @@ export class UserIsPartakerInWishlistGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const wishlistId = request.params.id;
+    console.log(request.params, request.user);
+    const wishlistId = request.params.wishlistId;
     const userId = request.user.id;
     return this.wishlistsService.validateUserIsPartakerInWishlist(
       +wishlistId,

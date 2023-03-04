@@ -9,7 +9,7 @@ export class UserIsCreatorOfWishGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
-    const wishId = request.params.id;
+    const wishId = request.params.wishId;
     const userId = request.user.id;
     return this.wishesService.validateUserIsCreatorOfWish(+wishId, +userId);
   }

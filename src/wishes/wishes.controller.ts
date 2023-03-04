@@ -16,10 +16,13 @@ import { WishEntity } from './entities/wish.entity';
 import { UserToken } from '../auth/interfaces/user-token.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+// import { UserIsPartakerInWishlistGuard } from 'src/wishlists/guards/user-is-partaker-in-wishlist.guard';
+import { UserIsCreatorOfWishGuard } from './guards/user-is-creator-of-wish/user-is-creator-of-wish.guard';
 
 @Controller('wishlists/:wishlistId/wishes')
 @ApiTags('wishes')
 @UseGuards(JwtAuthGuard)
+// @UseGuards(UserIsPartakerInWishlistGuard)
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
@@ -43,24 +46,26 @@ export class WishesController {
     return this.wishesService.findAll(+wishlistId);
   }
 
-  @Get(':id')
+  @Get(':wishId')
   @ApiOkResponse({ type: WishEntity })
-  findOne(@Param('id') id: string): Promise<WishEntity> {
-    return this.wishesService.findOne(+id);
+  findOne(@Param('wishId') wishId: string): Promise<WishEntity> {
+    return this.wishesService.findOne(+wishId);
   }
 
-  @Patch(':id')
+  @Patch(':wishId')
+  @UseGuards(UserIsCreatorOfWishGuard)
   @ApiOkResponse({ type: WishEntity })
   update(
-    @Param('id') id: string,
+    @Param('wishId') wishId: string,
     @Body() updateWishRequestDto: UpdateWishRequestDto,
   ): Promise<WishEntity> {
-    return this.wishesService.update(+id, updateWishRequestDto);
+    return this.wishesService.update(+wishId, updateWishRequestDto);
   }
 
-  @Delete(':id')
+  @Delete(':wishId')
+  @UseGuards(UserIsCreatorOfWishGuard)
   @ApiOkResponse({ type: WishEntity })
-  remove(@Param('id') id: string): Promise<WishEntity> {
-    return this.wishesService.remove(+id);
+  remove(@Param('wishId') wishId: string): Promise<WishEntity> {
+    return this.wishesService.remove(+wishId);
   }
 }

@@ -44,44 +44,46 @@ export class WishlistsController {
     return this.wishlistsService.findAll(user.id);
   }
 
-  @Get(':id')
+  @Get(':wishlistId')
   @UseGuards(UserIsPartakerInWishlistGuard)
   @ApiOkResponse({ type: WishlistDto })
-  findOne(@Param('id') id: string): Promise<WishlistDto> {
-    return this.wishlistsService.findOne(+id);
+  findOne(@Param('wishlistId') wishlistId: string): Promise<WishlistDto> {
+    return this.wishlistsService.findOne(+wishlistId);
   }
 
-  @Patch(':id')
+  @Patch(':wishlistId')
   @UseGuards(UserIsCreatorOfWishlistGuard)
   @ApiOkResponse({ type: WishlistDto })
   update(
-    @Param('id') id: string,
+    @Param('wishlistId') wishlistId: string,
     @Body() updateWishlistRequestDto: UpdateWishlistRequestDto,
   ): Promise<WishlistDto> {
-    return this.wishlistsService.update(+id, updateWishlistRequestDto);
+    return this.wishlistsService.update(+wishlistId, updateWishlistRequestDto);
   }
 
-  @Delete(':id')
+  @Delete(':wishlistId')
   @UseGuards(UserIsCreatorOfWishlistGuard)
   @ApiOkResponse({ type: WishlistDto })
-  delete(@Param('id') id: string): Promise<WishlistDto> {
-    return this.wishlistsService.remove(+id);
+  delete(@Param('wishlistId') wishlistId: string): Promise<WishlistDto> {
+    return this.wishlistsService.remove(+wishlistId);
   }
 
-  @Get(':id/partakers')
+  @Get(':wishlistId/partakers')
   @UseGuards(UserIsPartakerInWishlistGuard)
   @ApiOkResponse({ type: UserOnWishlistEntity, isArray: true })
-  getPartakers(@Param('id') id: string): Promise<UserOnWishlistEntity[]> {
-    return this.wishlistsService.getPartakers(+id);
+  getPartakers(
+    @Param('wishlistId') wishlistId: string,
+  ): Promise<UserOnWishlistEntity[]> {
+    return this.wishlistsService.getPartakers(+wishlistId);
   }
 
-  @Post(':id/partakers')
+  @Post(':wishlistId/partakers')
   @UseGuards(UserIsCreatorOfWishlistGuard)
   @ApiOkResponse({ type: UserResponseDto, isArray: true })
   addPartaker(
-    @Param('id') id: string,
+    @Param('wishlistId') wishlistId: string,
     @Body() addUserToWishlistDto: AddPartakerToWishlistRequestDto,
   ): Promise<WishlistDto> {
-    return this.wishlistsService.addPartaker(+id, addUserToWishlistDto);
+    return this.wishlistsService.addPartaker(+wishlistId, addUserToWishlistDto);
   }
 }
