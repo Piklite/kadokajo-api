@@ -38,9 +38,9 @@ model Wish {
 }
 
 model UsersOnWishlists {
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   wishlistId Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   isCreator  Boolean  @default(false)
 

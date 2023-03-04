@@ -1,18 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { initTestingApp } from './utils/init-app';
+import { PrismaService } from 'src/prisma.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let prisma: PrismaService;
 
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+  beforeAll(async () => {
+    const init = await initTestingApp(app, prisma);
+    app = init.app;
+    prisma = init.prisma;
   });
 
   it('/ (GET)', () => {
@@ -20,5 +18,10 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect('KadoKajo API v.0.0.1');
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+    await app.close();
   });
 });

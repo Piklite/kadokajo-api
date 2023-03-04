@@ -1,38 +1,28 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
-import { PrismaService } from '../src/prisma.service';
-import { PrismaClientExceptionFilter } from '../src/prisma-client-exception.filter';
-import { HttpAdapterHost } from '@nestjs/core';
+import { PrismaService } from '../prisma.service';
+import { initTestingApp } from '../../test/utils/init-app';
 
 describe('Auth', () => {
   const USER_INFOS_MOCK = {
-    email: 'john_connor@kadokajo.com',
-    username: 'JohnConnor',
+    email: 'sarah_connor@kadokajo.com',
+    username: 'SarahConnor',
     password: 'h@st@l@v15t@b@by!',
     confirmPassword: 'h@st@l@v15t@b@by!',
   };
+
   let access_token = '';
 
   let app: INestApplication;
   let prisma: PrismaService;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    prisma = moduleRef.get(PrismaService);
-    app = moduleRef.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
-    const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-    await app.init();
-
-    // await prisma.user.delete({ where: { email: USER_INFOS_MOCK.email } });
+    const init = await initTestingApp(app, prisma);
+    app = init.app;
+    prisma = init.prisma;
   });
 
-  describe('/POST create-account', () => {
+  describe('[POST] /auth/create-account', () => {
     describe('Email validation', () => {
       it('should throw if not a valid email adresse', () => {
         return request(app.getHttpServer())
@@ -186,7 +176,7 @@ describe('Auth', () => {
     });
   });
 
-  describe('/POST login', () => {
+  describe('[POST] /auth/login', () => {
     it('should throw a 401 if the user does not exist', () => {
       return request(app.getHttpServer())
         .post('/auth/login')
@@ -226,7 +216,7 @@ describe('Auth', () => {
     });
   });
 
-  describe('/PATCH change-password', () => {
+  describe('[PATCH] /auth/change-password', () => {
     describe('Password validation', () => {
       it('should throw if the email adresse is wrong', () => {
         return request(app.getHttpServer())
@@ -292,7 +282,7 @@ describe('Auth', () => {
     });
   });
 
-  describe('/DELETE delete-account', () => {
+  describe('[DELETE] /auth/delete-account', () => {
     it('should delete the user', async () => {
       await request(app.getHttpServer())
         .delete('/auth/delete-account')
@@ -306,6 +296,7 @@ describe('Auth', () => {
   });
 
   afterAll(async () => {
+    await prisma.$disconnect();
     await app.close();
   });
 });

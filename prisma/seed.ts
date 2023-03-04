@@ -1,16 +1,25 @@
 import { PrismaClient } from '@prisma/client';
-import { seedUser1, seedUser2, seedUser3 } from './seeds/users.seeds';
+import {
+  seedJohnConnor,
+  seedUser1,
+  seedUser2,
+  seedUser3,
+} from './seeds/users.seeds';
 import {
   seedWish1,
   seedWish2,
   seedWish3,
   seedWish4,
 } from './seeds/wishes.seed';
-import { seedWishlist1, seedWishlist2 } from './seeds/wishlists.seeds';
+import {
+  seedWishlist1,
+  seedWishlist2,
+  seedWishlistJC1,
+} from './seeds/wishlists.seeds';
 
 const prisma = new PrismaClient();
 
-async function main() {
+async function main(): Promise<void> {
   console.log('Started seeding database ...');
   const user1 = await seedUser1(prisma);
   const user2 = await seedUser2(prisma);
@@ -22,6 +31,8 @@ async function main() {
   await seedWish3(prisma, wishlist1, user2);
   await seedWish4(prisma, wishlist2, user2);
   console.log('Successfully seeded database ✔️');
+  const johnConnor = await seedJohnConnor(prisma);
+  const wishlistJC1 = await seedWishlistJC1(prisma, johnConnor);
 }
 
 main()

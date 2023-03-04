@@ -17,7 +17,6 @@ export class CreateWishlistRequestDto {
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   @MaxLength(255)
   @ApiProperty({ required: false })
   description?: string;
