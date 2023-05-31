@@ -9,6 +9,7 @@ import { PrismaClientExceptionFilter } from './prisma-client-exception.filter';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  app.enableCors();
 
   app.useGlobalPipes(new ValidationPipe());
 

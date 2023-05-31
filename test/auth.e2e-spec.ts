@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
+import { PrismaService } from '../src/prisma.service';
 import * as request from 'supertest';
-import { PrismaService } from '../prisma.service';
-import { initTestingApp } from '../../test/utils/init-app';
+import { initTestingApp } from './utils/init-app';
 
 describe('Auth', () => {
   const USER_INFOS_MOCK = {
