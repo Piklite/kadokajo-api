@@ -50,7 +50,7 @@ $ npm run start:prod
 
 ## Swagger
 
-You can access the Swagger documentation by running the app and go to "localhost:{$API_PORT}/api"
+You can access the Swagger documentation by running the app and go to "localhost:${API_PORT}/api"
 
 ## Test
 
