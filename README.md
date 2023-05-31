@@ -1,10 +1,10 @@
 ## Description
 
-Une superbe proposition d'API d'application pour que les cageots arretent de galérer pour s'offrir du sel à Noël.
+Une superbe proposition d'API d'application pour que les cageots arrêtent de galérer pour s'offrir du sel à Noël.
 
 ## Installation
 
-- Create a .env at the root of the project
+- Create a .env file at the root of the project
 - Configure the .env variables at your liking according to the .exemple.env
 
 ```bash
