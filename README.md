@@ -9,12 +9,6 @@ Une superbe proposition d'API d'application pour que les cageots arretent de gal
 
 ```bash
 $ npm install
-
-# Initiate the database
-$ npx prisma migrate dev
-
-# Seeding the database
-$ npx prisma db seed
 ```
 
 ## Database
